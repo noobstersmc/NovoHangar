@@ -27,6 +27,7 @@ javadoc {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    // Use Jitpack for public dependencies
     maven { url 'https://jitpack.io' }
 }
 
@@ -41,11 +42,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
 }
 
+/**TODO: Add actual unit testing to the project */
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
 
+/** Spigradle config */
 spigot {
     authors 'jcedeno'
     apiVersion '1.16'
@@ -58,8 +61,9 @@ spigot {
         serverPort 25564
         eula true
     }
-}/** Relocations for fatjar */
+}
+/** Relocations for fatjar */
 shadowJar {
 }
-// Ensure build calls shadowJar to generate the fatjar
+/** Ensure build calls shadowJar to generate the fatJar */ 
 build.dependsOn shadowJar
