@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'NovoHangar'
-include('app')
+include('paper')
