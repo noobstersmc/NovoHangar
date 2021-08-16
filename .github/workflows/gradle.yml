@@ -35,4 +35,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{env.repo_name_hynix}}-JDk16
-          path: build/libs
+          path: paper/build/libs
