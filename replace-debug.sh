@@ -3,4 +3,4 @@ chcp.com 65001
 # Build
 ./gradlew build
 # Copy the plugin into folder
-cp build/libs/*-all.jar debug/plugins/*-all.jar
+cp paper/build/libs/*-all.jar paper/debug/spigot/plugins/

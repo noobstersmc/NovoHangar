@@ -27,8 +27,7 @@ public class NovoHangar extends JavaPlugin implements Listener {
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if (e.getDamager()instanceof Player player) {
             var attacked = e.getEntity();
-            var msg = miniMessage
-                    .parse("<gradient:#5e4fa2:#f79459:red>Welcome to Java 16 and Spigot 1.16.5!</gradient>");
+            var msg = miniMessage.parse("<gradient:#5e4fa2:#f79459:red>Welcome to Noobsters!</gradient>");
             if (attacked instanceof LivingEntity entity) {
                 entity.getHealth();
             }

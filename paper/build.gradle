@@ -14,12 +14,16 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'io.freefair.lombok' version '6.1.0'
 }
-/** Set java target and compatibility */
-sourceCompatibility = 16
-targetCompatibility = 16
 
 /** Compiling and  Javadocs enconding options */
-compileJava.options.encoding = 'UTF-8'
+compileJava{
+    options.encoding = 'UTF-8'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
 javadoc {
     options.encoding = 'UTF-8'
 }
