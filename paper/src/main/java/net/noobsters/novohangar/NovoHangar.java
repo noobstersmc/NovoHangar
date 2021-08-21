@@ -1,6 +1,7 @@
 package net.noobsters.novohangar;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -8,7 +9,11 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.EnumWrappers.NativeGameMode;
 import com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -18,10 +23,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
 import kr.entree.spigradle.annotations.SpigotPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.md_5.bungee.api.ChatColor;
 import us.jcedeno.libs.rapidinv.RapidInvManager;
 
 @SpigotPlugin // Use @SpigotPlugin from spigradle to generate plugin.yml
@@ -42,10 +47,6 @@ public class NovoHangar extends JavaPlugin implements Listener {
         RapidInvManager.register(this);
         Bukkit.getPluginManager().registerEvents(this, this);
         protocolManager.addPacketListener(
-                new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.SPAWN_ENTITY) {
-
-                });
-        protocolManager.addPacketListener(
                 new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
                     @Override
                     public void onPacketSending(PacketEvent event) {
@@ -56,23 +57,40 @@ public class NovoHangar extends JavaPlugin implements Listener {
                             if (action.compareTo(PlayerInfoAction.ADD_PLAYER) == 0/** 0 = Add Player */
                             ) {
                                 var info = packet.getPlayerInfoDataLists().read(0);
-                                int count = 0;
+                                WrappedGameProfile pro = null;
+
                                 for (var entry : info) {
-                                    var c_profile = entry.getProfile().withName("HolaPinche");
+                                    var profile = entry.getProfile();
+                                    var handle = profile.getHandle();
 
-                                    var fields = c_profile.getHandle().getClass().getDeclaredFields();
-                                    for (var field : fields) {
-                                        System.out.println("Fields: " +field.getName());
+                                    setValue(handle, "name", getPlayerMaskName(event.getPlayer()));
+                                    if (pro == null) {
+                                        WrappedGameProfile.fromHandle(handle);
+                                        break;
                                     }
-                                    count++;
-
                                 }
-                                packet.getPlayerInfoDataLists().write(0, info);
+
+                                event.getPlayer().displayName(
+                                        miniMessage.parse("<gradient:#5e4fa2:#f79459>" + event.getPlayer().getName()));
+                                packet.getPlayerInfoDataLists().write(0, List
+                                        .of(new PlayerInfoData(pro, 69, NativeGameMode.SURVIVAL, WrappedChatComponent
+                                                .fromText(ChatColor.of("#f79459") + event.getPlayer().getName()))));
 
                             }
                         }
                     }
                 });
+    }
+
+    private String getPlayerMaskName(Player player) {
+        var max = Math.max(10, (int) Math.random() * 10);
+        var maskedName = "";
+        var cColor = ChatColor.COLOR_CHAR;
+
+        for (int i = 0; i < max; i++)
+            maskedName += cColor;
+
+        return maskedName;
     }
 
     public static void setValue(Object object, String field, Object value) {
@@ -99,12 +117,6 @@ public class NovoHangar extends JavaPlugin implements Listener {
             player.sendMessage(msg);
         }
 
-    }
-
-    @EventHandler
-    public void onChatEvent(AsyncChatEvent e) {
-        var player = e.getPlayer();
-        player.sendMessage(miniMessage.parse("Why are you not talking!"));
     }
 
 }
