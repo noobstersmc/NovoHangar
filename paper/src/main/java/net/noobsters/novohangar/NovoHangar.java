@@ -8,6 +8,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.NativeGameMode;
 import com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction;
@@ -75,6 +76,11 @@ public class NovoHangar extends JavaPlugin implements Listener {
                                 packet.getPlayerInfoDataLists().write(0, List
                                         .of(new PlayerInfoData(pro, 69, NativeGameMode.SURVIVAL, WrappedChatComponent
                                                 .fromText(ChatColor.of("#f79459") + event.getPlayer().getName()))));
+
+                                var fakeTeam = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+                                fakeTeam.getStrings().write(0, event.getPlayer().getName());
+                                fakeTeam.getChatComponents().write(1, WrappedChatComponent.fromHandle(
+                                        miniMessage.parse("<gradient:#5e4fa2:#f79459>" + event.getPlayer().getName())));
 
                             }
                         }
