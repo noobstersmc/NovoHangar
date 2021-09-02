@@ -48,7 +48,7 @@ public class BukkitTCT extends TaskChainTool {
                     var bukkitTask = bukkitRunnable.runTask(plugin);
 
                     var id = bukkitTask.getTaskId();
-                    while (plugin.getServer().getScheduler().isCurrentlyRunning(id)) {
+                    while (!bukkitTask.isCancelled() && plugin.getServer().getScheduler().isCurrentlyRunning(id)) {
                         // Hold on bukkit main thread
                         try {
                             Thread.sleep(50);
@@ -74,10 +74,6 @@ public class BukkitTCT extends TaskChainTool {
             }
             return true;
         });
-    }
-
-    public BukkitTCT addBukkitRunnable(BukkitRunnable runnable) {
-        return (BukkitTCT) add(runnable);
     }
 
 }

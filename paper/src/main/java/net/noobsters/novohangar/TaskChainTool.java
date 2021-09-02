@@ -3,6 +3,8 @@ package net.noobsters.novohangar;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.bukkit.scheduler.BukkitRunnable;
+
 /**
  * Quick util that allows developer to chain tasks together without having to
  * think much about it
@@ -67,7 +69,6 @@ public class TaskChainTool {
             queue.add(DelayTask.of(actualDelay));
 
         return this;
-
     }
 
     /**
@@ -101,7 +102,16 @@ public class TaskChainTool {
         var task = new TaskChainTool();
         task.add(() -> System.out.println("hello world")).add(DelayTask.of(500))
                 .add(() -> System.out.println("500ms have passed")).delay(1000)
-                .addWithDelay(() -> System.out.println("Using add with delay"), 1000);
+                .addWithDelay(() -> System.out.println("Using add with delay"), 1000)
+                .addWithDelay(new BukkitRunnable() {
+
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                }, 1000);
 
         var executingTask = task.execute();
         /**
