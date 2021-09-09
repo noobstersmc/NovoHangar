@@ -1,6 +1,7 @@
 package net.noobsters.novohangar;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.comphenix.protocol.PacketType;
@@ -53,39 +54,43 @@ public class NovoHangar extends JavaPlugin implements Listener {
                     public void onPacketSending(PacketEvent event) {
                         if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
                             var packet = event.getPacket();
+                            var player = event.getPlayer();
                             // Reference https://wiki.vg/Protocol#Player_Info
                             var action = packet.getPlayerInfoAction().read(0);
                             if (action.compareTo(PlayerInfoAction.ADD_PLAYER) == 0/** 0 = Add Player */
                             ) {
-                                var info = packet.getPlayerInfoDataLists().read(0);
-                                WrappedGameProfile pro = null;
+                                var cl = packet.deepClone();
+                                cl.getPlayerInfoDataLists().write(0,
+                                        List.of(new PlayerInfoData(
+                                                WrappedGameProfile
+                                                        .fromOfflinePlayer(Bukkit.getOfflinePlayer("InfinityZ")),
+                                                69, NativeGameMode.SURVIVAL,
+                                                WrappedChatComponent.fromText("TuMamacita"))));
 
-                                for (var entry : info) {
-                                    var profile = entry.getProfile();
-                                    var handle = profile.getHandle();
-
-                                    setValue(handle, "name", getPlayerMaskName(event.getPlayer()));
-                                    if (pro == null) {
-                                        WrappedGameProfile.fromHandle(handle);
-                                        break;
+                                ScheduleTaskForLater(() -> {
+                                    try {
+                                        protocolManager.sendServerPacket(player, cl);
+                                    } catch (InvocationTargetException e) {
+                                        e.printStackTrace();
                                     }
-                                }
+                                });
 
-                                event.getPlayer().displayName(
-                                        miniMessage.parse("<gradient:#5e4fa2:#f79459>" + event.getPlayer().getName()));
-                                packet.getPlayerInfoDataLists().write(0, List
-                                        .of(new PlayerInfoData(pro, 69, NativeGameMode.SURVIVAL, WrappedChatComponent
-                                                .fromText(ChatColor.of("#f79459") + event.getPlayer().getName()))));
-
-                                var fakeTeam = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
-                                fakeTeam.getStrings().write(0, event.getPlayer().getName());
-                                fakeTeam.getChatComponents().write(1, WrappedChatComponent.fromHandle(
-                                        miniMessage.parse("<gradient:#5e4fa2:#f79459>" + event.getPlayer().getName())));
-
+                            }
+                            var fakeTeam = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+                            fakeTeam.getStrings().write(0,
+                                    player.getName().substring(0, Math.min(player.getName().length(), 10)) + "-fake");
+                            try {
+                                protocolManager.sendServerPacket(player, fakeTeam);
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
                 });
+    }
+
+    private void ScheduleTaskForLater(Runnable runnable) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, runnable, 20);
     }
 
     private String getPlayerMaskName(Player player) {
