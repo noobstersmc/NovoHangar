@@ -41,6 +41,8 @@ public class Demo {
                 @Override
                 public void message(String channel, String message) {
                     System.out.println("Message received: " + message + " on channel: " + channel);
+                    var teamObjectReconstructed = gson.fromJson(message, TeamObject.class);
+                    teamObjectReconstructed.printTeam();
 
                 }
 

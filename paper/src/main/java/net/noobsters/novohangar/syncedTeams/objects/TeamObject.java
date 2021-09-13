@@ -86,4 +86,12 @@ public class TeamObject {
     public User[] getUsers() {
         return users;
     }
+
+    /** Print team */
+    public void printTeam() {
+        System.out.println("Team: " + teamName);
+        for (User user : users) {
+            System.out.println("\t" + user.getName());
+        }
+    }
 }
