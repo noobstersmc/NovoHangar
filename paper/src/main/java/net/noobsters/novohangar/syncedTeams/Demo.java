@@ -30,10 +30,10 @@ public class Demo {
         Thread.sleep(500);
         // Send the serialized data to the redis server.
         redisClient.connectPubSub().async().publish("dedsafio", gson.toJson(team));
-
-        while (true) {
-
-        }
+        // Sleep for a few milliseconds to allow for the write.
+        Thread.sleep(1000);
+        var query = redisClient.connect().sync().get("dedsafio-team:" + team.getTeamID());
+        System.out.println("The database contains: " + query);
     }
 
     private static Thread createNewApplicationThread(RedisClient redisClient) {
