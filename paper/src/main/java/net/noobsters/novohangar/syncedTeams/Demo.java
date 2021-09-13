@@ -21,10 +21,14 @@ public class Demo {
         var redisClient = RedisClient
                 .create(RedisURI.builder().withHost("redis-11764.c73.us-east-1-2.ec2.cloud.redislabs.com")
                         .withPort(11764).withPassword("Gxb1D0sbt3VoyvICOQKC8IwakpVdWegW").build());
+        // Create a thread with the logic to intercept the data to simulate a server
+        // recieving the data.
         var listenerThread = createNewApplicationThread(redisClient);
-
+        // Start the thread.
         listenerThread.start();
+        // Sleep for a few milliseconds to allow the thread to start.
         Thread.sleep(500);
+        // Send the serialized data to the redis server.
         redisClient.connectPubSub().async().publish("dedsafio", gson.toJson(team));
 
         while (true) {
@@ -34,15 +38,24 @@ public class Demo {
 
     private static Thread createNewApplicationThread(RedisClient redisClient) {
         return new Thread(() -> {
+            // Create an async connection to send command through.
+            var asyncConnect = redisClient.connect().async();
+            // Create a pubSub connection for communication pipeline.
             var pubSub = redisClient.connectPubSub();
+            // Connect the pubSub
             var sync = pubSub.sync();
+            // Define the pubSub listener.
             pubSub.addListener(new RedisPubSubListener<String, String>() {
 
                 @Override
                 public void message(String channel, String message) {
                     System.out.println("Message received: " + message + " on channel: " + channel);
+                    // Reconstruct the serialized object.
                     var teamObjectReconstructed = gson.fromJson(message, TeamObject.class);
+                    // Print contents of team
                     teamObjectReconstructed.printTeam();
+                    // Save the team data to long term storage and for API access.
+                    asyncConnect.set("dedsafio-team:" + teamObjectReconstructed.getTeamID(), message);
 
                 }
 
