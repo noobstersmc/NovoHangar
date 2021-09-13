@@ -50,6 +50,8 @@ dependencies {
     implementation 'net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT'
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    // Faker to generate fake names
+    implementation 'com.github.javafaker:javafaker:1.0.2'
 }
 
 /**TODO: Add actual unit testing to the project */

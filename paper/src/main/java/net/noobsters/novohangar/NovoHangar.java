@@ -53,6 +53,7 @@ public class NovoHangar extends JavaPlugin implements Listener {
                     @Override
                     public void onPacketSending(PacketEvent event) {
                         if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
+
                             var packet = event.getPacket();
                             var player = event.getPlayer();
                             // Reference https://wiki.vg/Protocol#Player_Info
@@ -67,7 +68,7 @@ public class NovoHangar extends JavaPlugin implements Listener {
                                                 69, NativeGameMode.SURVIVAL,
                                                 WrappedChatComponent.fromText("TuMamacita"))));
 
-                                ScheduleTaskForLater(() -> {
+                                scheduleTaskForLater(() -> {
                                     try {
                                         protocolManager.sendServerPacket(player, cl);
                                     } catch (InvocationTargetException e) {
@@ -89,7 +90,17 @@ public class NovoHangar extends JavaPlugin implements Listener {
                 });
     }
 
-    private void ScheduleTaskForLater(Runnable runnable) {
+    /** Method that creates a packet with information containing a fake player. */
+    private void createFakePlayer(Player player) {
+        var fakePlayer = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+        fakePlayer.getPlayerInfoAction().write(0, PlayerInfoAction.ADD_PLAYER);
+        fakePlayer.getPlayerInfoDataLists().write(0,
+                List.of(new PlayerInfoData(WrappedGameProfile.fromOfflinePlayer(Bukkit.getOfflinePlayer("InfinityZ")),
+                        69, NativeGameMode.SURVIVAL, WrappedChatComponent.fromText("TuMamacita"))));
+
+    }
+
+    private void scheduleTaskForLater(Runnable runnable) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, runnable, 20);
     }
 
